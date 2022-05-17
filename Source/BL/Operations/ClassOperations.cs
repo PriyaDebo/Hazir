@@ -18,6 +18,11 @@ namespace BL.Operations
         public async Task<IEnumerable<IClass>> GetAsync()
         {
             var responseClass = await classRepository.GetAllClassesAsync();
+            if (responseClass == null)
+            {
+                return null;
+            }
+
             foreach (var responseClassItem in responseClass)
             {
                 var studentIds = responseClassItem.StudentIds;
@@ -38,6 +43,11 @@ namespace BL.Operations
         public async Task<IClass> GetClassByIdAsync(string id)
         {
             var responseClass = await classRepository.GetClassByIdAsync(id);
+            if (responseClass == null)
+            {
+                return null;
+            }
+
             var studentIds = responseClass.StudentIds;
             if (responseClass.Students == null)
             {

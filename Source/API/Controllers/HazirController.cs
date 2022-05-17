@@ -36,7 +36,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetAllClasses")]
-        public async Task<IEnumerable<ClassResponseModel>> GetAllClassesAsync()
+        public async Task<IEnumerable<ClassResponseModel?>> GetAllClassesAsync()
         {
             var classes = await classOperations.GetAsync();
             var classAPI = new List<ClassResponseModel>();
