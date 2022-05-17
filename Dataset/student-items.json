@@ -1,0 +1,52 @@
+[
+    {
+        "name": "John",
+        "joinDate": "2020-01-01",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Susan",
+        "joinDate": "2020-01-02",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Marc",
+        "joinDate": "2020-01-02",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Lily",
+        "joinDate": "2020-01-03",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Oscar",
+        "joinDate": "2020-01-04",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Nellie",
+        "joinDate": "2020-01-04",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Kevin",
+        "joinDate": "2020-01-03",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Helene",
+        "joinDate": "2020-01-06",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "David",
+        "joinDate": "2020-01-04",
+        "persistedFaceId": "123"
+    },
+    {
+        "name": "Angela",
+        "joinDate": "2020-01-01",
+        "persistedFaceId": "123"
+    }
+]
