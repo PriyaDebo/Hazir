@@ -8,6 +8,19 @@ namespace DAL.Models
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class ClassData : IClass
     {
+        public ClassData()
+        {
+        }
+
+        public ClassData(ClassData classData)
+        {
+            this.Id = classData.Id;
+            this.Name = classData.Name;
+            this.StudentIds = classData.StudentIds;
+            this.CourseId = classData.CourseId;
+            this.TeacherId = classData.TeacherId;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
