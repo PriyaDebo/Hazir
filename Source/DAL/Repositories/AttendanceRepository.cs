@@ -5,14 +5,14 @@ using Microsoft.Azure.Cosmos;
 
 namespace DAL.Repositories
 {
-    internal class AttendanceRepository
+    public class AttendanceRepository
     {
         private CosmosClient? client;
         private Database? database;
         private Container? container;
         readonly ConnectDatabase cd;
 
-        AttendanceRepository()
+        public AttendanceRepository()
         {
             cd = new ConnectDatabase();
             client = cd.Client;
@@ -26,7 +26,7 @@ namespace DAL.Repositories
             {
                 Date = date,
                 ClassId = classId,
-                PresentStudentIds = null
+                PresentStudentIds = new List<string>()
             };
             var attendanceItemCreated = await container.CreateItemAsync<AttendanceData>(attendance);
             return attendanceItemCreated.Resource;
@@ -60,5 +60,22 @@ namespace DAL.Repositories
             };
             return attendance;
         }
+
+        //public override async Task<IAttendance> GetAttendanceDataAsync(string classId, string date)
+        //{
+        //    var query = "SELECT * FROM Attendance WHERE Attendance.classId = {classId}";
+        //    QueryDefinition queryDefinition = new QueryDefinition(query);
+        //    var attendanceResponse = this.container.GetItemQueryIterator<AttendanceData>(queryDefinition);
+        //    var response = await attendanceResponse.ReadNextAsync();
+        //    var attendance = new Attendance()
+        //    {
+        //        Id = response.Resource.FirstOrDefault().Id,
+        //        ClassId = response.Resource.FirstOrDefault().ClassId,
+        //        Date = response.Resource.FirstOrDefault().Date,
+        //        PresentStudentIds = response.Resource.FirstOrDefault().PresentStudentIds,
+        //    };
+
+        //    return attendance;
+        //}
     }
 }

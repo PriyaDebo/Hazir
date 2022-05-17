@@ -1,6 +1,7 @@
 using API.Extensions;
 using API.Models;
 using BL.Operations;
+using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -13,12 +14,14 @@ namespace API.Controllers
         private readonly ILogger<HazirController> logger;
         StudentOperations studentOperations;
         ClassOperations classOperations;
+        AttendanceOperations attendanceOperations;
 
         public HazirController(ILogger<HazirController> logger)
         {
             this.logger = logger;
             studentOperations = new StudentOperations();
             classOperations = new ClassOperations();
+            attendanceOperations = new AttendanceOperations();
         }
 
         [HttpGet]
@@ -62,5 +65,21 @@ namespace API.Controllers
             var student = await studentOperations.GetByIdAsync("310daa64-6328-45c1-b24e-573e40431d94");
             return student.ToAPIModel();
         }
+
+        [HttpPut]
+        [Route("CreateAttendanceItem")]
+        public async Task<IAttendance> CreteNewItem(string classId, string date)
+        {
+            var attendance = await attendanceOperations.CreateAttendanceItem(date, classId);
+            return attendance;
+        }
+
+        //[HttpPost]
+        //[Route("MarkAttendance")]
+        //public async Task<> MarkAttendance(string id, string classId, string studentId)
+        //{
+
+        //}
+
     }
 }
