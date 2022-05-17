@@ -1,0 +1,26 @@
+[
+    {
+        "classId": 1,
+        "courseId": 1,
+        "teacherId": 1,
+        "students": [
+            "70a7a91d-3178-4019-bd68-762a05c61014",
+            "b41605eb-8258-4b9e-8f8e-8df26d45b3d4",
+            "b2f5cec2-0225-4cca-8035-58370eea0453",
+            "a7f40c6e-82f0-4534-bd0b-e4abfaae4a4e",
+            "dec2d195-b64f-42cd-bdad-f571a54cdedd"
+        ]
+    },
+    {
+        "classId": 2,
+        "courseId": 3,
+        "teacherId": 4,
+        "students": [
+            "3f3343bc-981f-4d64-a4da-431f8b2d2ba2",
+            "253ae6ba-a07b-4448-b004-2df1bee5457c",
+            "d3dbff7c-696e-4cc7-a02d-5aef702ee56e",
+            "73a674ad-e523-4650-9864-2a2e245d8237",
+            "262340d0-edb9-4416-8f8a-5115cfc98264"
+        ]
+    }
+]
