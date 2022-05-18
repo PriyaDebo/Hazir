@@ -14,10 +14,17 @@ namespace API.Extensions
                 StudentIds = iClass.StudentIds,
                 CourseId = iClass.CourseId
             };
+
+            if (model.Students == null)
+            {
+                model.Students = new List<StudentResponseModel>();
+            }
+
             foreach (var student in iClass.Students)
             {
                 model.Students.Add(student.ToAPIModel());
             }
+
             return model;
         }
     }

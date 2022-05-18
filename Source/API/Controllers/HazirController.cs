@@ -39,7 +39,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetAllClasses")]
-        public async Task<IEnumerable<ClassResponseModel>> GetAllClassesAsync()
+        public async Task<IEnumerable<ClassResponseModel?>> GetAllClassesAsync()
         {
             var classes = await classOperations.GetAsync();
             var classAPI = new List<ClassResponseModel>();
@@ -52,17 +52,17 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetClassById")]
-        public async Task<ClassResponseModel> GetSingleClassAsync()
+        public async Task<ClassResponseModel> GetSingleClassAsync(string id)
         {
-            var classResponse = await classOperations.GetClassByIdAsync("77f5bf43-5375-4218-8658-4dad24be3b9e");
+            var classResponse = await classOperations.GetClassByIdAsync(id);
             return classResponse.ToAPIModel();
         }
 
         [HttpGet]
         [Route("GetStudentById")]
-        public async Task<StudentResponseModel> GetSingleStudentAsync()
+        public async Task<StudentResponseModel> GetSingleStudentAsync(string id)
         {
-            var student = await studentOperations.GetByIdAsync("310daa64-6328-45c1-b24e-573e40431d94");
+            var student = await studentOperations.GetByIdAsync(id);
             return student.ToAPIModel();
         }
 

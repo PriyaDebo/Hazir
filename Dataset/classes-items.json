@@ -4,11 +4,11 @@
         "courseId": 1,
         "teacherId": 1,
         "students": [
-            "70a7a91d-3178-4019-bd68-762a05c61014",
-            "b41605eb-8258-4b9e-8f8e-8df26d45b3d4",
-            "b2f5cec2-0225-4cca-8035-58370eea0453",
-            "a7f40c6e-82f0-4534-bd0b-e4abfaae4a4e",
-            "dec2d195-b64f-42cd-bdad-f571a54cdedd"
+            "310daa64-6328-45c1-b24e-573e40431d94",
+            "cbcd5bcf-7581-41dc-aab8-9c462ec3d04a",
+            "6452c2f7-fb84-4f3c-90c0-f7a3d75837c2",
+            "f846dffd-7be1-4b24-afe6-b6779b34a320",
+            "4c1ab98f-45a1-49dc-8e46-874b2492dfad"
         ]
     },
     {
@@ -16,11 +16,11 @@
         "courseId": 3,
         "teacherId": 4,
         "students": [
-            "3f3343bc-981f-4d64-a4da-431f8b2d2ba2",
-            "253ae6ba-a07b-4448-b004-2df1bee5457c",
-            "d3dbff7c-696e-4cc7-a02d-5aef702ee56e",
-            "73a674ad-e523-4650-9864-2a2e245d8237",
-            "262340d0-edb9-4416-8f8a-5115cfc98264"
+            "0906d27c-0c14-42c7-8ecb-44117e5bbc5c",
+            "b7b33cd1-aa9f-4a4f-9f9a-577c41b5fde8",
+            "485e88c6-21ed-462b-84fa-ea7c5c7f6862",
+            "c93150f3-94e3-4c42-8f1f-8ebd0f6242a0",
+            "54c9fbdc-3915-49b4-a2f6-fd5062b92fd7"
         ]
     }
 ]
