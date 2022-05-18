@@ -15,6 +15,16 @@ namespace API.Extensions
                 PresentStudentIds = attendance.PresentStudentIds,
             };
 
+            if (attendance.PresentStudents == null)
+            {
+                return model;
+            }
+
+            if (model.PrsesentStudents == null)
+            {
+                model.PrsesentStudents = new List<StudentResponseModel>();
+            }
+
             foreach (var student in attendance.PresentStudents)
             {
                 model.PrsesentStudents.Add(student.ToAPIModel());

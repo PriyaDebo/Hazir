@@ -33,21 +33,10 @@ namespace DAL.Repositories
             return attendanceItemCreated.Resource;
         }
 
-        public async Task MarkAttendanceAsync(string id, string classId, string studentId)
-        {
-            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
-            var newAttendance = new AttendanceData(attendance.Resource);
-            if (newAttendance.PresentStudentIds == null)
-            {
-                newAttendance.PresentStudentIds = new List<string>();
-            }
-            newAttendance.PresentStudentIds.Append(studentId);
-            await container.ReplaceItemAsync<AttendanceData>(newAttendance, id);
-        }
-
         public async Task<IAttendance> GetAttendanceDataAsync(string id, string classId)
         {
-            var response = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            var partitionKey = new PartitionKey(classId);
+            var response = await container.ReadItemAsync<AttendanceData>(id, partitionKey);
             if (response == null)
             {
                 return null;
@@ -62,34 +51,71 @@ namespace DAL.Repositories
             return attendance;
         }
 
-        public async Task UnmarkAttendanceAsync(string id, string classId, string studentId)
+        public async Task<IAttendance> GetAttendanceDataByClassAndDateAsync(string classId, string date)
         {
-            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
-            foreach (var presentStudent in attendance.Resource.PresentStudentIds)
+            var query = $"SELECT * FROM Attendance WHERE Attendance.classId = @classId";
+            QueryDefinition queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId);
+            var attendanceResponse = container.GetItemQueryIterator<AttendanceData>(queryDefinition);
+            var response = await attendanceResponse.ReadNextAsync();
+            if (response == null)
             {
-                if (presentStudent == studentId)
-                {
-                    attendance.Resource.PresentStudentIds.Remove(studentId);
-                }
+                return null;
             }
-            await container.ReplaceItemAsync<AttendanceData>(attendance, id);
+
+            var attendance = new Attendance()
+            {
+                Id = response.Resource.FirstOrDefault().Id,
+                ClassId = response.Resource.FirstOrDefault().ClassId,
+                Date = response.Resource.FirstOrDefault().Date,
+                PresentStudentIds = response.Resource.FirstOrDefault().PresentStudentIds,
+            };
+
+            return attendance;
         }
 
-        //public override async Task<IAttendance> GetAttendanceDataAsync(string classId, string date)
-        //{
-        //    var query = "SELECT * FROM Attendance WHERE Attendance.classId = {classId}";
-        //    QueryDefinition queryDefinition = new QueryDefinition(query);
-        //    var attendanceResponse = this.container.GetItemQueryIterator<AttendanceData>(queryDefinition);
-        //    var response = await attendanceResponse.ReadNextAsync();
-        //    var attendance = new Attendance()
-        //    {
-        //        Id = response.Resource.FirstOrDefault().Id,
-        //        ClassId = response.Resource.FirstOrDefault().ClassId,
-        //        Date = response.Resource.FirstOrDefault().Date,
-        //        PresentStudentIds = response.Resource.FirstOrDefault().PresentStudentIds,
-        //    };
+        public async Task<bool> MarkAttendanceAsync(string id, string classId, string studentId)
+        {
+            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            if (attendance == null)
+            {
+                return false;
+            }
+            var newAttendance = new AttendanceData(attendance.Resource);
+            if (newAttendance.PresentStudentIds == null)
+            {
+                newAttendance.PresentStudentIds = new List<string>();
+            }
+            newAttendance.PresentStudentIds.Add(studentId);
+            await container.ReplaceItemAsync<AttendanceData>(newAttendance, id);
+            return true;
+        }
 
-        //    return attendance;
-        //}
+        public async Task<bool> UnmarkAttendanceAsync(string id, string classId, string studentId)
+        {
+            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            if (attendance == null)
+            {
+                return false;
+            }
+
+            var newAttendance = new AttendanceData()
+            {
+                Id = attendance.Resource.Id,
+                ClassId = attendance.Resource.ClassId,
+                Date = attendance.Resource.Date,
+            };
+
+            newAttendance.PresentStudentIds = new List<string>();
+            foreach (var presentStudent in attendance.Resource.PresentStudentIds)
+            {
+                if (presentStudent != studentId)
+                {
+                    newAttendance.PresentStudentIds.Remove(studentId);
+                }
+            }
+
+            await container.ReplaceItemAsync<AttendanceData>(newAttendance, id);
+            return true;
+        }
     }
 }

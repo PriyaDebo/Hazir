@@ -1,7 +1,6 @@
 using API.Extensions;
 using API.Models;
 using BL.Operations;
-using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -39,7 +38,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetAllClasses")]
-        public async Task<IEnumerable<ClassResponseModel?>> GetAllClassesAsync()
+        public async Task<IEnumerable<ClassResponseModel>> GetAllClassesAsync()
         {
             var classes = await classOperations.GetAsync();
             var classAPI = new List<ClassResponseModel>();
@@ -51,7 +50,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("GetClassById")]
+        [Route("GetClassById/class/{classId}")]
         public async Task<ClassResponseModel> GetSingleClassAsync(string id)
         {
             var classResponse = await classOperations.GetClassByIdAsync(id);
@@ -59,7 +58,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("GetStudentById")]
+        [Route("GetStudentById/student/{studentId}")]
         public async Task<StudentResponseModel> GetSingleStudentAsync(string id)
         {
             var student = await studentOperations.GetByIdAsync(id);
@@ -68,7 +67,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("CreateAttendanceItem/class/{classId}/date/{date}")]
-        public async Task<ActionResult<IAttendance>> CreateAttendanceItem(string classId, string date)
+        public async Task<ActionResult<AttendanceResponseModel>> CreateAttendanceItem(string classId, string date)
         {
             var isDate = DateOnly.TryParse(date, out var parsedDate);
             if (!isDate)
@@ -76,15 +75,53 @@ namespace API.Controllers
                 return BadRequest("Invalid Date");
             }
             var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), classId);
-            return Ok(attendance);
+            return Ok(attendance.ToAPIModel());
         }
 
-        //[HttpPost]
-        //[Route("MarkAttendance")]
-        //public async Task<> MarkAttendance(string id, string classId, string studentId)
-        //{
+        [HttpGet]
+        [Route("GetAttendanceById/attendance/{AttendanceId}/class/{classId}")]
+        public async Task<ActionResult<AttendanceResponseModel>> GetByAttendanceId(string attendanceId, string classId)
+        {
+            var responseAttendance = await attendanceOperations.GetAttendanceByIdAsync(attendanceId, classId);
+            return Ok(responseAttendance.ToAPIModel());
+        }
 
-        //}
+        [HttpGet]
+        [Route("GetAttendanceByClassAndDate/class/{classId}/date/{date}")]
+        public async Task<ActionResult<AttendanceResponseModel>> GetAttendanceByClassAndDate(string classId, string date)
+        {
+            var isDate = DateOnly.TryParse(date, out var parsedDate);
+            if (!isDate)
+            {
+                return BadRequest("Invalid Date");
+            }
 
+            var responseAttendance = await attendanceOperations.GetAttendanceByClassAndDateAsync(classId, date);
+            return Ok(responseAttendance.ToAPIModel());
+        }
+
+        [HttpPost]
+        [Route("MarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
+        public async Task<ActionResult> MarkAttendance(string id, string classId, string studentId)
+        {
+            var response = await attendanceOperations.MarkAttendanceAsync(id, classId, studentId);
+            if (response)
+            {
+                return Ok(response);
+            }
+            return NotFound("Invalid Id");
+        }
+
+        [HttpPost]
+        [Route("UnmarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
+        public async Task<ActionResult> UnmarkAttendance(string id, string classId, string studentId)
+        {
+            var response = await attendanceOperations.UnmarkAttendanceAsync(id, classId, studentId);
+            if (response)
+            {
+                return Ok(response);
+            }
+            return NotFound("Invalid Id");
+        }
     }
 }
