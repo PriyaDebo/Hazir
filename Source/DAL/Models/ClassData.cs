@@ -14,11 +14,11 @@ namespace DAL.Models
 
         public ClassData(ClassData classData)
         {
-            this.Id = classData.Id;
-            this.Name = classData.Name;
-            this.StudentIds = classData.StudentIds;
-            this.CourseId = classData.CourseId;
-            this.TeacherId = classData.TeacherId;
+            Id = classData.Id;
+            Name = classData.Name;
+            StudentIds = classData.StudentIds;
+            CourseId = classData.CourseId;
+            TeacherId = classData.TeacherId;
         }
 
         [JsonProperty(PropertyName = "id")]

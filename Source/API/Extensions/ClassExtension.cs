@@ -7,11 +7,13 @@ namespace API.Extensions
     {
         public static ClassResponseModel ToAPIModel(this IClass iClass)
         {
-            var model = new ClassResponseModel();
-            model.Id = iClass.Id;
-            model.TeacherId = iClass.TeacherId;
-            model.StudentIds = iClass.StudentIds;
-            model.CourseId = iClass.CourseId;
+            var model = new ClassResponseModel
+            {
+                Id = iClass.Id,
+                TeacherId = iClass.TeacherId,
+                StudentIds = iClass.StudentIds,
+                CourseId = iClass.CourseId
+            };
             foreach (var student in iClass.Students)
             {
                 model.Students.Add(student.ToAPIModel());

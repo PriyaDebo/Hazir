@@ -10,12 +10,12 @@ namespace BL.Operations
 
         public AttendanceOperations()
         {
-            this.attendanceRepository = new AttendanceRepository();
+            attendanceRepository = new AttendanceRepository();
         }
 
         public async Task<IAttendance> CreateAttendanceItem(string date, string classId)
         {
-            var response = await this.attendanceRepository.CreateAttendanceDataAsync(date, classId);
+            var response = await attendanceRepository.CreateAttendanceDataAsync(date, classId);
             var attendance = new Attendance()
             {
                 ClassId = response.ClassId,
@@ -26,5 +26,7 @@ namespace BL.Operations
 
             return attendance;
         }
+
+
     }
 }

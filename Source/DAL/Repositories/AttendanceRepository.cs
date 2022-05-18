@@ -24,6 +24,7 @@ namespace DAL.Repositories
         {
             var attendance = new AttendanceData()
             {
+                Id = Guid.NewGuid().ToString(),
                 Date = date,
                 ClassId = classId,
                 PresentStudentIds = new List<string>()
@@ -59,6 +60,19 @@ namespace DAL.Repositories
                 PresentStudentIds = response.Resource.PresentStudentIds,
             };
             return attendance;
+        }
+
+        public async Task UnmarkAttendanceAsync(string id, string classId, string studentId)
+        {
+            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            foreach (var presentStudent in attendance.Resource.PresentStudentIds)
+            {
+                if (presentStudent == studentId)
+                {
+                    attendance.Resource.PresentStudentIds.Remove(studentId);
+                }
+            }
+            await container.ReplaceItemAsync<AttendanceData>(attendance, id);
         }
 
         //public override async Task<IAttendance> GetAttendanceDataAsync(string classId, string date)

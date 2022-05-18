@@ -67,11 +67,16 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Route("CreateAttendanceItem")]
-        public async Task<IAttendance> CreteNewItem(string classId, string date)
+        [Route("CreateAttendanceItem/class/{classId}/date/{date}")]
+        public async Task<ActionResult<IAttendance>> CreateAttendanceItem(string classId, string date)
         {
-            var attendance = await attendanceOperations.CreateAttendanceItem(date, classId);
-            return attendance;
+            var isDate = DateOnly.TryParse(date, out var parsedDate);
+            if (!isDate)
+            {
+                return BadRequest("Invalid Date");
+            }
+            var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), classId);
+            return Ok(attendance);
         }
 
         //[HttpPost]

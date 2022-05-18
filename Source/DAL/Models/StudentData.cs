@@ -13,10 +13,10 @@ namespace DAL.Models
 
         public StudentData(StudentData student)
         {
-            this.Id = student.Id;
-            this.Name = student.Name;
-            this.JoinDate = student.JoinDate;
-            this.PersistedFaceId = student.PersistedFaceId;
+            Id = student.Id;
+            Name = student.Name;
+            JoinDate = student.JoinDate;
+            PersistedFaceId = student.PersistedFaceId;
         }
 
         [JsonProperty(PropertyName = "id")]
