@@ -7,6 +7,18 @@ namespace DAL.Models
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     internal class StudentData : IStudent
     {
+        public StudentData()
+        {
+        }
+
+        public StudentData(StudentData student)
+        {
+            Id = student.Id;
+            Name = student.Name;
+            JoinDate = student.JoinDate;
+            PersistedFaceId = student.PersistedFaceId;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 

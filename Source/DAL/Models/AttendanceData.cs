@@ -5,7 +5,7 @@ using Newtonsoft.Json.Serialization;
 namespace DAL.Models
 {
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    internal class AttendanceData : IAttendance
+    public class AttendanceData : IAttendance
     {
         public AttendanceData()
         {
@@ -18,7 +18,6 @@ namespace DAL.Models
             Date = attendance.Date;
             PresentStudentIds = attendance.PresentStudentIds;
         }
-
 
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
