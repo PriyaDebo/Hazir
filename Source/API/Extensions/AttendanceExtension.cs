@@ -12,7 +12,6 @@ namespace API.Extensions
                 Id = attendance.Id,
                 ClassId = attendance.ClassId,
                 Date = attendance.Date,
-                PresentStudentIds = attendance.PresentStudentIds,
             };
 
             if (attendance.PresentStudents == null)

@@ -51,17 +51,29 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetClassById/class/{classId}")]
-        public async Task<ClassResponseModel> GetSingleClassAsync(string id)
+        public async Task<ActionResult<ClassResponseModel>> GetSingleClassAsync(string classId)
         {
-            var classResponse = await classOperations.GetClassByIdAsync(id);
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
+            var classResponse = await classOperations.GetClassByIdAsync(parsedClassId.ToString());
             return classResponse.ToAPIModel();
         }
 
         [HttpGet]
         [Route("GetStudentById/student/{studentId}")]
-        public async Task<StudentResponseModel> GetSingleStudentAsync(string id)
+        public async Task<ActionResult<StudentResponseModel>> GetSingleStudentAsync(string studentId)
         {
-            var student = await studentOperations.GetByIdAsync(id);
+            var isStudentId = Guid.TryParse(studentId, out var parsedStudentId);
+            if (!isStudentId)
+            {
+                return BadRequest("Invalid Student Id");
+            }
+
+            var student = await studentOperations.GetByIdAsync(parsedStudentId.ToString());
             return student.ToAPIModel();
         }
 
@@ -69,20 +81,38 @@ namespace API.Controllers
         [Route("CreateAttendanceItem/class/{classId}/date/{date}")]
         public async Task<ActionResult<AttendanceResponseModel>> CreateAttendanceItem(string classId, string date)
         {
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
             var isDate = DateOnly.TryParse(date, out var parsedDate);
             if (!isDate)
             {
                 return BadRequest("Invalid Date");
             }
-            var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), classId);
+            var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), parsedClassId.ToString());
             return Ok(attendance.ToAPIModel());
         }
 
         [HttpGet]
-        [Route("GetAttendanceById/attendance/{AttendanceId}/class/{classId}")]
+        [Route("GetAttendanceById/attendance/{attendanceId}/class/{classId}")]
         public async Task<ActionResult<AttendanceResponseModel>> GetByAttendanceId(string attendanceId, string classId)
         {
-            var responseAttendance = await attendanceOperations.GetAttendanceByIdAsync(attendanceId, classId);
+            var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
+            if (!isAttendanceId)
+            {
+                return BadRequest("Invalid Attendance Id");
+            }
+
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
+            var responseAttendance = await attendanceOperations.GetAttendanceByIdAsync(parsedAttendanceId.ToString(), parsedClassId.ToString());
             return Ok(responseAttendance.ToAPIModel());
         }
 
@@ -90,21 +120,45 @@ namespace API.Controllers
         [Route("GetAttendanceByClassAndDate/class/{classId}/date/{date}")]
         public async Task<ActionResult<AttendanceResponseModel>> GetAttendanceByClassAndDate(string classId, string date)
         {
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
             var isDate = DateOnly.TryParse(date, out var parsedDate);
             if (!isDate)
             {
                 return BadRequest("Invalid Date");
             }
 
-            var responseAttendance = await attendanceOperations.GetAttendanceByClassAndDateAsync(classId, date);
+            var responseAttendance = await attendanceOperations.GetAttendanceByClassAndDateAsync(parsedClassId.ToString(), parsedDate.ToString());
             return Ok(responseAttendance.ToAPIModel());
         }
 
         [HttpPost]
         [Route("MarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
-        public async Task<ActionResult> MarkAttendance(string id, string classId, string studentId)
+        public async Task<ActionResult> MarkAttendance(string attendanceId, string classId, string studentId)
         {
-            var response = await attendanceOperations.MarkAttendanceAsync(id, classId, studentId);
+            var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
+            if (!isAttendanceId)
+            {
+                return BadRequest("Invalid Attendance Id");
+            }
+
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
+            var isStudentId = Guid.TryParse(studentId, out var parsedStudentId);
+            if (!isStudentId)
+            {
+                return BadRequest("Invalid Student Id");
+            }
+
+            var response = await attendanceOperations.MarkAttendanceAsync(parsedAttendanceId.ToString(), parsedClassId.ToString(), parsedStudentId.ToString());
             if (response)
             {
                 return Ok(response);
@@ -114,9 +168,27 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("UnmarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
-        public async Task<ActionResult> UnmarkAttendance(string id, string classId, string studentId)
+        public async Task<ActionResult> UnmarkAttendance(string attendanceId, string classId, string studentId)
         {
-            var response = await attendanceOperations.UnmarkAttendanceAsync(id, classId, studentId);
+            var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
+            if (!isAttendanceId)
+            {
+                return BadRequest("Invalid Attendance Id");
+            }
+
+            var isClassId = Guid.TryParse(classId, out var parsedClassId);
+            if (!isClassId)
+            {
+                return BadRequest("Invalid Class Id");
+            }
+
+            var isStudentId = Guid.TryParse(studentId, out var parsedStudentId);
+            if (!isStudentId)
+            {
+                return BadRequest("Invalid Student Id");
+            }
+
+            var response = await attendanceOperations.UnmarkAttendanceAsync(parsedAttendanceId.ToString(), parsedClassId.ToString(), parsedStudentId.ToString());
             if (response)
             {
                 return Ok(response);

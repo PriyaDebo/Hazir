@@ -15,7 +15,7 @@ namespace BL.Operations
             studentRepository = new StudentRepository();
         }
 
-        public async Task<IAttendance> ToDTOModelAsync(IAttendance attendanceResponse)
+        public async Task<IAttendance> AddStudentDataAsync(IAttendance attendanceResponse)
         {
             var attendance = new Attendance()
             {
@@ -55,13 +55,13 @@ namespace BL.Operations
         public async Task<IAttendance> GetAttendanceByIdAsync(string id, string classId)
         {
             var attendanceResponse = await attendanceRepository.GetAttendanceDataAsync(id, classId);
-            return await ToDTOModelAsync(attendanceResponse);
+            return await AddStudentDataAsync(attendanceResponse);
         }
 
         public async Task<IAttendance> GetAttendanceByClassAndDateAsync(string classId, string date)
         {
             var attendanceResponse = await attendanceRepository.GetAttendanceDataByClassAndDateAsync(classId, date);
-            return await ToDTOModelAsync(attendanceResponse);
+            return await AddStudentDataAsync(attendanceResponse);
         }
 
         public async Task<bool> MarkAttendanceAsync(string id, string classId, string studentId)
