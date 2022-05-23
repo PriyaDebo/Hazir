@@ -1,0 +1,41 @@
+﻿@page "/classes"
+@using Microsoft.Extensions.Logging
+@inject ILogger<Classes> Logger;
+
+<PageTitle>Classes</PageTitle>
+
+<div class = "wrapper-div">
+    <div class = "wrapper-div-upper">
+        <a href = '/' class = "app-name">hazir</a>
+    </div>
+    <div class = "wrapper-div-lower">
+        <div class = "wrapper-div-sidebar">
+            <div class="nav-item">
+
+            </div>
+        </div>
+        <div class = "wrapper-div-middle">
+            <button class = "take-attendance" >Take Attendance</button>
+        </div>
+        <div class = "wrapper-div-right">
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called");
+
+        // Process the valid form
+    }
+
+}
