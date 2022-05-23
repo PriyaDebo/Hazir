@@ -1,4 +1,4 @@
-﻿namespace API.Models
+﻿namespace Common.APIModels
 {
     public class ClassResponseModel
     {
@@ -7,6 +7,8 @@
         public string CourseId { get; set; }
 
         public string TeacherId { get; set; }
+
+        public string Name { get; set; }
 
         public List<string> StudentIds { get; set; }
 

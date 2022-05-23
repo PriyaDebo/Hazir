@@ -1,6 +1,7 @@
 ﻿@page "/classes"
-@using Microsoft.Extensions.Logging
-@inject ILogger<Classes> Logger;
+@using Common.APIModels;
+@using System.Diagnostics;
+@inject HttpClient Http;
 
 <PageTitle>Classes</PageTitle>
 
@@ -11,7 +12,6 @@
     <div class = "wrapper-div-lower">
         <div class = "wrapper-div-sidebar">
             <div class="nav-item">
-
             </div>
         </div>
         <div class = "wrapper-div-middle">
@@ -23,19 +23,15 @@
     </div>
 </div>
 
-@code {
-    private int currentCount = 0;
+@code{
+    private List<ClassResponseModel>? classes;
 
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-
-    private void HandleValidSubmit()
-    {
-        Logger.LogInformation("HandleValidSubmit called");
-
-        // Process the valid form
-    }
-
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    classes = await Http.GetFromJsonAsync<List<ClassResponseModel>>("https:localhost:7204/Hazir/GetAllClasses");
+    //    foreach (var classData in classes)
+    //    {
+    //        Debug.WriteLine(classData.Name);
+    //    }
+    //}
 }

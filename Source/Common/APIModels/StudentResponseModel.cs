@@ -1,4 +1,4 @@
-﻿namespace API.Models
+﻿namespace Common.APIModels
 
 {
     public class StudentResponseModel

@@ -1,5 +1,5 @@
+using Common.APIModels;
 using API.Extensions;
-using API.Models;
 using BL.Operations;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +41,25 @@ namespace API.Controllers
         public async Task<IEnumerable<ClassResponseModel>> GetAllClassesAsync()
         {
             var classes = await classOperations.GetAsync();
+            var classAPI = new List<ClassResponseModel>();
+            foreach (var singleClass in classes)
+            {
+                classAPI.Add(singleClass.ToAPIModel());
+            }
+            return classAPI;
+        }
+
+        [HttpGet]
+        [Route("GetClassesByTeacher/teacherId/{teacherId}")]
+        public async Task<ActionResult<IEnumerable<ClassResponseModel>>> GetClassesByTeacherAsync(string teacherId)
+        {
+            var isTeacherId = Guid.TryParse(teacherId, out var parsedTeacherId);
+            if (!isTeacherId)
+            {
+                return BadRequest("Invalid Teacher Id");
+            }
+
+            var classes = await classOperations.GetClassByTeacher(parsedTeacherId.ToString());
             var classAPI = new List<ClassResponseModel>();
             foreach (var singleClass in classes)
             {

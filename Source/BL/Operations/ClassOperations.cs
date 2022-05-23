@@ -40,6 +40,31 @@ namespace BL.Operations
             return responseClass;
         }
 
+        public async Task<IEnumerable<IClass>> GetClassByTeacher(string teacherId)
+        {
+            var responseClass = await classRepository.GetClassByTeacher(teacherId);
+            if (responseClass == null)
+            {
+                return null;
+            }
+
+            foreach (var responseClassItem in responseClass)
+            {
+                var studentIds = responseClassItem.StudentIds;
+                if (responseClassItem.Students == null)
+                {
+                    responseClassItem.Students = new List<IStudent>();
+                }
+
+                foreach (var studentId in studentIds)
+                {
+                    responseClassItem.Students.Add(await studentOperations.GetByIdAsync(studentId));
+                }
+            }
+
+            return responseClass;
+        }
+
         public async Task<IClass> GetClassByIdAsync(string id)
         {
             var responseClass = await classRepository.GetClassByIdAsync(id);

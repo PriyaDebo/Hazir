@@ -56,7 +56,7 @@ namespace DAL.Repositories
         public async Task<IAttendance> GetAttendanceDataByClassAndDateAsync(string classId, string date)
         {
             var query = $"SELECT * FROM Attendance WHERE Attendance.classId = @classId AND Attendance.date = @date";
-            QueryDefinition queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId);
+            QueryDefinition queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId).WithParameter("@date", date);
             var attendanceResponse = container.GetItemQueryIterator<AttendanceData>(queryDefinition);
             var response = await attendanceResponse.ReadNextAsync();
             if (response == null)
