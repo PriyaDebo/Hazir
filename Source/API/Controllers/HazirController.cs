@@ -1,6 +1,6 @@
-using Common.APIModels;
 using API.Extensions;
 using BL.Operations;
+using Common.APIModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -38,7 +38,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("GetAllClasses")]
-        public async Task<IEnumerable<ClassResponseModel>> GetAllClassesAsync()
+        public async Task<ActionResult<IEnumerable<ClassResponseModel>>> GetAllClassesAsync()
         {
             var classes = await classOperations.GetAsync();
             var classAPI = new List<ClassResponseModel>();
@@ -46,11 +46,11 @@ namespace API.Controllers
             {
                 classAPI.Add(singleClass.ToAPIModel());
             }
-            return classAPI;
+            return Ok(classAPI);
         }
 
         [HttpGet]
-        [Route("GetClassesByTeacher/teacherId/{teacherId}")]
+        [Route("GetClassesByTeacher/teachers/{teacherId}")]
         public async Task<ActionResult<IEnumerable<ClassResponseModel>>> GetClassesByTeacherAsync(string teacherId)
         {
             var isTeacherId = Guid.TryParse(teacherId, out var parsedTeacherId);
@@ -65,11 +65,11 @@ namespace API.Controllers
             {
                 classAPI.Add(singleClass.ToAPIModel());
             }
-            return classAPI;
+            return Ok(classAPI);
         }
 
         [HttpGet]
-        [Route("GetClassById/class/{classId}")]
+        [Route("GetClassById/classes/{classId}")]
         public async Task<ActionResult<ClassResponseModel>> GetSingleClassAsync(string classId)
         {
             var isClassId = Guid.TryParse(classId, out var parsedClassId);
@@ -79,11 +79,11 @@ namespace API.Controllers
             }
 
             var classResponse = await classOperations.GetClassByIdAsync(parsedClassId.ToString());
-            return classResponse.ToAPIModel();
+            return Ok(classResponse.ToAPIModel());
         }
 
         [HttpGet]
-        [Route("GetStudentById/student/{studentId}")]
+        [Route("GetStudentById/students/{studentId}")]
         public async Task<ActionResult<StudentResponseModel>> GetSingleStudentAsync(string studentId)
         {
             var isStudentId = Guid.TryParse(studentId, out var parsedStudentId);
@@ -97,7 +97,7 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Route("CreateAttendanceItem/class/{classId}/date/{date}")]
+        [Route("CreateAttendanceItem/classes/{classId}/date/{date}")]
         public async Task<ActionResult<AttendanceResponseModel>> CreateAttendanceItem(string classId, string date)
         {
             var isClassId = Guid.TryParse(classId, out var parsedClassId);
@@ -116,7 +116,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAttendanceById/attendance/{attendanceId}/class/{classId}")]
+        [Route("GetAttendanceById/attendance/{attendanceId}/classes/{classId}")]
         public async Task<ActionResult<AttendanceResponseModel>> GetByAttendanceId(string attendanceId, string classId)
         {
             var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
@@ -136,7 +136,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAttendanceByClassAndDate/class/{classId}/date/{date}")]
+        [Route("GetAttendanceByClassAndDate/classes/{classId}/date/{date}")]
         public async Task<ActionResult<AttendanceResponseModel>> GetAttendanceByClassAndDate(string classId, string date)
         {
             var isClassId = Guid.TryParse(classId, out var parsedClassId);
@@ -156,7 +156,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("MarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
+        [Route("MarkAttendance/attendance/{attendanceId}/classes/{classId}/students/{studentId}")]
         public async Task<ActionResult> MarkAttendance(string attendanceId, string classId, string studentId)
         {
             var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
@@ -186,7 +186,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Route("UnmarkAttendance/attendance/{attendanceId}/class/{classId}/student/{studentId}")]
+        [Route("UnmarkAttendance/attendance/{attendanceId}/classes/{classId}/students/{studentId}")]
         public async Task<ActionResult> UnmarkAttendance(string attendanceId, string classId, string studentId)
         {
             var isAttendanceId = Guid.TryParse(attendanceId, out var parsedAttendanceId);
