@@ -1,4 +1,4 @@
-﻿using API.Models;
+﻿using Common.APIModels;
 using Common.Models;
 
 namespace API.Extensions
@@ -10,6 +10,7 @@ namespace API.Extensions
             var model = new ClassResponseModel
             {
                 Id = iClass.Id,
+                Name = iClass.Name,
                 TeacherId = iClass.TeacherId,
                 StudentIds = iClass.StudentIds,
                 CourseId = iClass.CourseId

@@ -1,0 +1,124 @@
+﻿@page "/classes"
+@using Common.APIModels;
+@using System.Diagnostics;
+@using Microsoft.Extensions.Logging
+@inject ILogger<Classes> Logger;
+@inject HttpClient Http;
+
+<PageTitle>Classes</PageTitle>
+
+<div class = "wrapper-div">
+    <div class = "wrapper-div-upper">
+        <a href = '/' class = "app-name">hazir</a>
+    </div>
+
+    <div class = "wrapper-div-lower">
+        <div class = "wrapper-div-sidebar">
+            <div class = "nav-item">
+                <button type="button" class = "nav-item-head" @onclick="@expandSidebar">
+                    <span class = "oi oi-calendar"></span> Classes
+                </button>
+                @if (expandSubNav)
+                {
+                    if (classes == null)
+                    {
+                        <p class = "nav-subitem">Loading...</p>
+                    }
+                    else
+                    {
+                            foreach (var classData in classes)
+                            {
+                                string cssClass = "nav-subitem unselected";
+                                if (selectedClass?.Id == classData?.Id)
+                                {
+                                    cssClass = "nav-subitem selected";
+                                }
+
+                                <button type="button" class = "@cssClass" @onclick="() => selectClass(classData)">
+                                    <span class = "oi oi-pencil"></span>
+                                        @classData?.Name
+                                </button>
+                            }
+                    }
+                }
+            </div>
+        </div>
+
+        <div class = "wrapper-div-middle">
+            <EditForm Model = "@Date">
+                <div  class = "form">
+                    <div class = "fill-date">
+                        <label for="Date">Attendance Date</label>
+                        <InputDate id = "attendance-date" class = "fill-date select-date" @bind-Value = "Date" />
+                    </div>
+                    <button class = "take-attendance" >Take Attendance</button>
+                </div>
+            </EditForm>
+        </div>
+
+        <div class = "wrapper-div-right">
+            @if (selectedClass == null)
+            {
+                <div class = "instruction">Select any class to view students</div>
+            }
+            else
+            {
+                <div class = "instruction">Students</div>
+                if (selectedClass.Students == null)
+                {
+                    <div class = "instruction">This class has no students</div>
+                }
+                else
+                {
+                    foreach(var student in selectedClass.Students)
+                    {
+                        studentCount++;
+                        if (studentCount % 2 == 0)
+                        {
+                            <p class = "student no-record-even">@student.Name</p>
+                        }
+                        else
+                        {
+                            <p class = "student no-record-odd">@student.Name</p>
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+@code{
+    private List<ClassResponseModel> classes;
+    private AttendanceResponseModel attendance;
+    private ClassResponseModel selectedClass;
+    private int studentCount = 0;
+
+    private DateOnly Date;
+    private bool expandSubNav;
+
+    private void expandSidebar()
+    {
+        expandSubNav = !expandSubNav;
+        this.selectedClass = null;
+        studentCount = 0;
+    }
+
+    private void selectClass(ClassResponseModel classData)
+    {
+        this.selectedClass = classData;
+        studentCount = 0;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetFromJsonAsync<List<ClassResponseModel>>("https://localhost:7204/Hazir/GetClassesByTeacher/teachers/79f4b45a-5043-4132-a168-07e21310062b");
+        if (response != null)
+        {
+            this.classes = response;
+        }
+    }
+}
