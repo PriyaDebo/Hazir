@@ -1,13 +1,11 @@
-﻿.wrapper-div
-{
+﻿.wrapper-div {
     display: flex;
     width: 100vw;
     height: 100vh;
     flex-direction: column;
 }
 
-.wrapper-div-upper
-{
+.wrapper-div-upper {
     display: flex;
     flex-direction: column;
     flex: 4%;
@@ -18,8 +16,7 @@
     border-bottom-color: #5000FA;
 }
 
-.app-name
-{
+.app-name {
     color: #5000FA;
     font-size: 1.8vw;
     font-weight: 900;
@@ -30,8 +27,7 @@
     text-decoration: none;
 }
 
-.wrapper-div-lower
-{
+.wrapper-div-lower {
     display : flex;
     flex: 90%;
     flex-direction: row;
@@ -48,40 +44,91 @@
     padding: 1%;
 }
 
-.take-attendance
-{
-    background-color: #009213;
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+.take-attendance {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
     font-family: 'Poppins', sans-serif;
-    color: #ffffff;
     padding: 1vh;
     border: none;
     font-size: 2vh;
+    background-color: #009213;
+    color: #ffffff;
 }
 
-.wrapper-div-right
-{
-    flex:20%;
+.fill-date {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    padding: 1vh;
+    border: solid;
+    border-color: #5000FA;
+    font-size: 2vh;
+    gap: 1vw;
+}
+
+    .fill-date.select-date {
+        display: flex;
+        width: 100%
+    }
+
+
+.wrapper-div-right {
+    display: flex;
+    flex-direction: column;
+    flex: 20vw;
     background-color: #ffffff;
+    border-left: solid;
+    border-color: #5000FA;
 }
 
-.student-odd
-{
-    background: #5000FA;
-    height: 4%;
+.instruction {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    font-size: 2vh;
-    color: #ffffff;
+    align-content: center;
+    font-size: 1.8vh;
+    padding-left: 1vw;
     font-family: 'Poppins', sans-serif;
+    background-color: #5000FA;
+    color: #ffffff;
 }
 
-.student-even {
-    background: #5D1BEA;
-    height: 4%;
+.student {
+    display: flex;
+    flex-direction: column;
+    height: 3%;
     width: 100%;
+    color: #000000;
     font-size: 2vh;
-    color: #ffffff;
     font-family: 'Poppins', sans-serif;
+    padding-left: 1vw;
 }
+
+    .student.present {
+        background-color: #a9d36e;
+    }
+
+    .student.absent {
+        background-color: #dc8686;
+    }
+
+    .student.no-record-odd {
+        background: #ffffff;
+    }
+
+    .student.no-record-even {
+        background: #F7F3FF;
+    }
+
 
 .wrapper-div-sidebar
 {
@@ -108,10 +155,8 @@
     font-family: 'Poppins', sans-serif;
 }
 
-.nav-item-head
-{
+.nav-item-head {
     display: flex;
-    elevation: above;
     padding: 0;
     font-size: 1.5vh;
     border: none;
@@ -135,7 +180,6 @@
     width: 100%;
     border: none;
     height: 5vh;
-    background-color: #2D008B;
     color: #ffffff;
     align-items: center;
     justify-content: left;
@@ -143,6 +187,15 @@
     gap: 0.5vw;
     padding-left: 0.5vw;
 }
+
+    .nav-subitem.selected
+    {
+        background-color: #23006b;
+    }
+
+    .nav-subitem.unselected {
+        background-color: #2D008B;
+    }
 
     .nav-subitem:hover
     {

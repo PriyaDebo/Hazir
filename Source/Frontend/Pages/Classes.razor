@@ -22,15 +22,21 @@
                 {
                     if (classes == null)
                     {
-                        <p class = "nav-subitem"><em>Loading...</em></p>
+                        <p class = "nav-subitem">Loading...</p>
                     }
                     else
                     {
-                            @foreach (var classData in classes)
+                            foreach (var classData in classes)
                             {
-                                <button type="button" class = "nav-subitem" @onclick="() => selectClass(classData)">
+                                string cssClass = "nav-subitem unselected";
+                                if (selectedClass?.Id == classData?.Id)
+                                {
+                                    cssClass = "nav-subitem selected";
+                                }
+
+                                <button type="button" class = "@cssClass" @onclick="() => selectClass(classData)">
                                     <span class = "oi oi-pencil"></span>
-                                    @classData.Name
+                                        @classData?.Name
                                 </button>
                             }
                     }
@@ -39,35 +45,50 @@
         </div>
 
         <div class = "wrapper-div-middle">
-            <button class = "take-attendance" >Take Attendance</button>
             <EditForm Model = "@Date">
-                <InputDate id = "attendance-date" @bind-Value = "Date" />
+                <div  class = "form">
+                    <div class = "fill-date">
+                        <label for="Date">Attendance Date</label>
+                        <InputDate id = "attendance-date" class = "fill-date select-date" @bind-Value = "Date" />
+                    </div>
+                    <button class = "take-attendance" >Take Attendance</button>
+                </div>
             </EditForm>
         </div>
 
         <div class = "wrapper-div-right">
             @if (selectedClass == null)
             {
-                <p class = "student-odd">Select any class to view students</p>
+                <div class = "instruction">Select any class to view students</div>
             }
             else
             {
-                foreach(var student in selectedClass.Students)
+                <div class = "instruction">Students</div>
+                if (selectedClass.Students == null)
                 {
-                    studentCount++;
-                    if (studentCount % 2 == 0)
+                    <div class = "instruction">This class has no students</div>
+                }
+                else
+                {
+                    foreach(var student in selectedClass.Students)
                     {
-                        <p class = "student-even">@student.Name</p>
-                    }
-                    else
-                    {
-                        <p class = "student-odd">@student.Name</p>
+                        studentCount++;
+                        if (studentCount % 2 == 0)
+                        {
+                            <p class = "student no-record-even">@student.Name</p>
+                        }
+                        else
+                        {
+                            <p class = "student no-record-odd">@student.Name</p>
+                        }
                     }
                 }
             }
         </div>
     </div>
 </div>
+
+
 
 
 @code{
