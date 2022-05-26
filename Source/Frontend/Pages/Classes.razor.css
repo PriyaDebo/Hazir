@@ -42,6 +42,7 @@
     background-color: #F7F3FF;
     flex-direction: column;
     padding: 1%;
+    gap: 1vw;
 }
 
 .form {
@@ -53,7 +54,9 @@
 .take-attendance {
     display: flex;
     flex-direction: column;
-    text-align: center;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     font-family: 'Poppins', sans-serif;
     padding: 1vh;
@@ -210,4 +213,16 @@
 .oi {
     font-size: 1.5vh;
     vertical-align: middle;
+}
+
+.camera {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border:solid;
+    border-color: #5000FA;
+    gap: 1vh;
 }

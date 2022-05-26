@@ -59,7 +59,7 @@ namespace DAL.Repositories
             QueryDefinition queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId).WithParameter("@date", date);
             var attendanceResponse = container.GetItemQueryIterator<AttendanceData>(queryDefinition);
             var response = await attendanceResponse.ReadNextAsync();
-            if (response == null)
+            if (response.Resource.FirstOrDefault() == null)
             {
                 return null;
             }

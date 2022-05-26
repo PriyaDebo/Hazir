@@ -1,9 +1,8 @@
 ﻿@page "/classes"
 @using Common.APIModels;
 @using System.Diagnostics;
-@using Microsoft.Extensions.Logging
-@inject ILogger<Classes> Logger;
 @inject HttpClient Http;
+@inject IJSRuntime JSRuntime;
 
 <PageTitle>Classes</PageTitle>
 
@@ -26,18 +25,17 @@
                     }
                     else
                     {
-                            foreach (var classData in classes)
+                        foreach (var classData in classes)
+                        {
+                            string cssClass = "nav-subitem unselected";
+                            if (selectedClass?.Id == classData?.Id)
                             {
-                                string cssClass = "nav-subitem unselected";
-                                if (selectedClass?.Id == classData?.Id)
-                                {
-                                    cssClass = "nav-subitem selected";
-                                }
-
-                                <button type="button" class = "@cssClass" @onclick="() => selectClass(classData)">
-                                    <span class = "oi oi-pencil"></span>
-                                        @classData?.Name
-                                </button>
+                                cssClass = "nav-subitem selected";
+                            }
+                            <button type="button" class = "@cssClass" @onclick="() => selectClass(classData)">
+                                <span class = "oi oi-pencil" />
+                                @classData?.Name
+                            </button>
                             }
                     }
                 }
@@ -45,15 +43,26 @@
         </div>
 
         <div class = "wrapper-div-middle">
-            <EditForm Model = "@Date">
-                <div  class = "form">
-                    <div class = "fill-date">
-                        <label for="Date">Attendance Date</label>
-                        <InputDate id = "attendance-date" class = "fill-date select-date" @bind-Value = "Date" />
-                    </div>
-                    <button class = "take-attendance" >Take Attendance</button>
-                </div>
-            </EditForm>
+           @if (selectedClass != null)
+           {
+               <EditForm Model = "@Date" OnValidSubmit = "@HandleValidSubmit">
+                   <div  class = "form">
+                       <div class = "fill-date">
+                           <label for="Date">Attendance Date</label>
+                           <InputDate id = "attendance-date" class = "fill-date select-date" @bind-Value = "Date"/>
+                       </div>
+                       <button type = "submit" class = "take-attendance" >Take Attendance</button>
+                   </div>
+               </EditForm>
+           }
+
+            @if (true)
+            {
+                <div class = "camera">
+                         <div id="camera"></div>
+                 <button class = "take-attendance" @onclick="Capture">Capture</button>
+                 </div>
+            }
         </div>
 
         <div class = "wrapper-div-right">
@@ -70,16 +79,50 @@
                 }
                 else
                 {
-                    foreach(var student in selectedClass.Students)
+                    if (Date == DateOnly.FromDateTime(DateTime.Now))
                     {
-                        studentCount++;
-                        if (studentCount % 2 == 0)
+                        if (attendance == null)
                         {
-                            <p class = "student no-record-even">@student.Name</p>
+                            foreach (var student in selectedClass.Students)
+                            {
+                                studentCount++;
+                                if (studentCount % 2 == 0)
+                                {
+                                    <p class = "student no-record-even">@student.Name</p>
+                                }
+                                else
+                                {
+                                    <p class = "student no-record-odd">@student.Name</p>
+                                }
+                            }
                         }
                         else
                         {
-                            <p class = "student no-record-odd">@student.Name</p>
+                            foreach (var student in selectedClass.Students)
+                            {
+                                if (isPresent(student.Id))
+                                {
+                                    <p class = "student present">@student.Name</p>
+                                }
+                                else
+                                {
+                                    <p class = "student no-record-even">@student.Name</p>
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var student in selectedClass.Students)
+                        {
+                            if (isPresent(student.Id))
+                            {
+                                <p class = "student present">@student.Name</p>
+                            }
+                            else
+                            {
+                                <p class = "student absent">@student.Name</p>
+                            }
                         }
                     }
                 }
@@ -90,15 +133,46 @@
 
 
 
-
 @code{
+
+
+    List<string> stringList = new List<string>();
+    string aa = "";
+    public async void Capture()
+    {
+        stringList.Add(await JSRuntime.InvokeAsync<string>("take_snapshot"));
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("ready", this);
+        }
+    }
+
+
     private List<ClassResponseModel> classes;
     private AttendanceResponseModel attendance;
     private ClassResponseModel selectedClass;
     private int studentCount = 0;
+    private bool attendanceStarted = false;
 
-    private DateOnly Date;
+    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
     private bool expandSubNav;
+
+    private bool isPresent(string studentId)
+    {
+        foreach (var student in attendance.PrsesentStudents)
+        {
+            if (student.Id == studentId)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void expandSidebar()
     {
@@ -111,6 +185,20 @@
     {
         this.selectedClass = classData;
         studentCount = 0;
+    }
+
+    private async void HandleValidSubmit()
+    {
+        var uriFormat = @"https://localhost:7204/Hazir/CreateAttendanceItem/classes/{0}/date/{1}";
+        var uri = string.Format(uriFormat, Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(Date.ToString()));
+        var response = await Http.PutAsJsonAsync<AttendanceResponseModel>(uri, null);
+
+        var attendance = await response.Content.ReadFromJsonAsync<AttendanceResponseModel>();
+        if (attendance != null)
+        {
+            attendanceStarted = true;
+            this.attendance = attendance;
+        }
     }
 
     protected override async Task OnInitializedAsync()

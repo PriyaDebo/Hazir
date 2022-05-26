@@ -2,6 +2,7 @@ using API.Extensions;
 using BL.Operations;
 using Common.APIModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace API.Controllers
 {
@@ -106,12 +107,18 @@ namespace API.Controllers
                 return BadRequest("Invalid Class Id");
             }
 
-            var isDate = DateOnly.TryParse(date, out var parsedDate);
-            if (!isDate)
-            {
-                return BadRequest("Invalid Date");
-            }
-            var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), parsedClassId.ToString());
+            date = Uri.UnescapeDataString(date);
+
+            //string format = "dd/MM/yyyy";
+
+            //var isDate = DateTime.TryParseExact(date, "M-d-yyyy h:mm tt zzz", CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
+            //if (!isDate)
+            //{
+            //    return BadRequest("Invalid Date");
+            //}
+
+
+            var attendance = await attendanceOperations.CreateAttendanceItem(date, parsedClassId.ToString());
             return Ok(attendance.ToAPIModel());
         }
 

@@ -40,6 +40,12 @@ namespace BL.Operations
 
         public async Task<IAttendance> CreateAttendanceItem(string date, string classId)
         {
+            var alreadyExists = await attendanceRepository.GetAttendanceDataByClassAndDateAsync(classId, date);
+            if (alreadyExists != null)
+            {
+                return await GetAttendanceByClassAndDateAsync(classId, date);
+            }
+
             var response = await attendanceRepository.CreateAttendanceDataAsync(date, classId);
             var attendance = new Attendance()
             {
