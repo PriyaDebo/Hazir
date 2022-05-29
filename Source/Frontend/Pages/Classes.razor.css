@@ -1,0 +1,246 @@
+﻿.wrapper-div {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.wrapper-div-upper {
+    display: flex;
+    flex-direction: column;
+    flex: 4%;
+    justify-content: center;
+    align-content:center;
+    padding-left: 2vh;
+    border-bottom: solid;
+    border-bottom-color: #5000FA;
+    overflow: clip;
+}
+
+.app-name {
+    color: #5000FA;
+    font-size: 1.8vw;
+    font-weight: 900;
+    font-family: Samarkan;
+    line-height: 4vw;
+    letter-spacing: -0.1vw;
+    text-align: left;
+    text-decoration: none;
+}
+
+.wrapper-div-lower {
+    display: flex;
+    flex: 90%;
+    flex-direction: row;
+    width: 100%;
+    height: 94vh;
+}
+
+
+.wrapper-div-middle {
+    flex: 60%;
+    display: flex;
+    background-color: #F7F3FF;
+    flex-direction: column;
+    padding: 1%;
+    gap: 1vw;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+    .form.display-none {
+        display: none;
+    }
+
+.take-attendance {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    padding: 1vh;
+    border: none;
+    border-radius: 0.5vw;
+    font-size: 2vh;
+    background-color: #009213;
+    color: #ffffff;
+}
+
+    .take-attendance.display-none {
+        display: none;
+    }
+
+.fill-date {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    padding: 1vh;
+    border: solid;
+    border-color: #5000FA;
+    border-radius: 0.5vw;
+    font-size: 2vh;
+    gap: 1vw;
+}
+
+    .fill-date.select-date {
+        display: flex;
+        width: 100%
+    }
+
+
+.wrapper-div-right {
+    display: flex;
+    flex-direction: column;
+    flex: 20%;
+    background-color: #ffffff;
+    border-left: solid;
+    border-color: #5000FA;
+    overflow-y: auto;
+}
+
+.instruction {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-content: center;
+    font-size: 1.8vh;
+    padding-left: 1vw;
+    font-family: 'Poppins', sans-serif;
+    background-color: #5000FA;
+    color: #ffffff;
+}
+
+.student {
+    display: flex;
+    flex-direction: column;
+    height: 3%;
+    width: 100%;
+    color: #000000;
+    font-size: 2vh;
+    font-family: 'Poppins', sans-serif;
+    padding-left: 1vw;
+}
+
+    .student.present {
+        background-color: #a9d36e;
+    }
+
+    .student.absent {
+        background-color: #dc8686;
+    }
+
+    .student.no-record-odd {
+        background: #ffffff;
+    }
+
+    .student.no-record-even {
+        background: #F7F3FF;
+    }
+
+
+.wrapper-div-sidebar
+{
+    flex: 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    color: #ffffff;
+    background-color: #5000FA;
+    height: 100%;
+    width: 20%;
+    padding: 0;
+    overflow-y: auto;
+}
+
+
+.nav-item
+{
+    padding: 0;
+    width: 100%;
+    background-color: #5000FA;
+    color: #ffffff;
+    align-content: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.nav-item-head {
+    display: flex;
+    padding: 0;
+    font-size: 1.5vh;
+    border: none;
+    width: 100%;
+    height: 5vh;
+    background-color: #5000FA;
+    color: #ffffff;
+    align-items: center;
+    justify-content: left;
+    font-family: 'Poppins', sans-serif;
+    gap: 0.5vw;
+    padding-left: 0.5vw;
+}
+
+.nav-subitem {
+    display: flex;
+    padding: 0;
+    font-size: 1.2vh;
+    direction: ltr;
+    border: none;
+    width: 100%;
+    border: none;
+    height: 5vh;
+    color: #ffffff;
+    align-items: center;
+    justify-content: left;
+    font-family: 'Poppins', sans-serif;
+    gap: 0.5vw;
+    padding-left: 0.5vw;
+}
+
+    .nav-subitem.selected
+    {
+        background-color: #23006b;
+    }
+
+    .nav-subitem.unselected {
+        background-color: #2D008B;
+    }
+
+    .nav-subitem:hover
+    {
+        background-color: #23006b;
+    }
+
+    .nav-subitem:focus
+    {
+        background-color: #23006b;
+    }
+
+.oi {
+    font-size: 1.5vh;
+    vertical-align: middle;
+}
+
+.camera {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border:solid;
+    border-color: #5000FA;
+    gap: 1vh;
+    border-radius: 0.5vw;
+}
+
+    .camera.display-none {
+        display: none;
+    }
