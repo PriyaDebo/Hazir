@@ -1,16 +1,24 @@
+using BL.Operations;
+using DAL.Repositories;
+using Microsoft.Azure.Cosmos;
+
 var builder = WebApplication.CreateBuilder(args);
+var primaryKey = builder.Configuration["CosmosDbPrimaryKey"];
+var endpoint = builder.Configuration["CosmosDbEndpoint"];
 
-// Add services to the container.
-
-
+builder.Services.AddScoped<StudentOperations>();
+builder.Services.AddScoped<AttendanceOperations>();
+builder.Services.AddScoped<ClassOperations>();
+builder.Services.AddScoped<AttendanceRepository>();
+builder.Services.AddScoped<ClassRepository>();
+builder.Services.AddScoped<StudentRepository>();
+builder.Services.AddScoped(sp => new CosmosClient(endpoint, primaryKey));
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

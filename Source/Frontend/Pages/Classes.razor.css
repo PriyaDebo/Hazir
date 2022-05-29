@@ -14,6 +14,7 @@
     padding-left: 2vh;
     border-bottom: solid;
     border-bottom-color: #5000FA;
+    overflow: clip;
 }
 
 .app-name {
@@ -28,7 +29,7 @@
 }
 
 .wrapper-div-lower {
-    display : flex;
+    display: flex;
     flex: 90%;
     flex-direction: row;
     width: 100%;
@@ -37,7 +38,7 @@
 
 
 .wrapper-div-middle {
-    flex: 70%;
+    flex: 60%;
     display: flex;
     background-color: #F7F3FF;
     flex-direction: column;
@@ -51,6 +52,10 @@
     gap: 2vh;
 }
 
+    .form.display-none {
+        display: none;
+    }
+
 .take-attendance {
     display: flex;
     flex-direction: column;
@@ -61,10 +66,15 @@
     font-family: 'Poppins', sans-serif;
     padding: 1vh;
     border: none;
+    border-radius: 0.5vw;
     font-size: 2vh;
     background-color: #009213;
     color: #ffffff;
 }
+
+    .take-attendance.display-none {
+        display: none;
+    }
 
 .fill-date {
     display: flex;
@@ -74,6 +84,7 @@
     padding: 1vh;
     border: solid;
     border-color: #5000FA;
+    border-radius: 0.5vw;
     font-size: 2vh;
     gap: 1vw;
 }
@@ -87,10 +98,11 @@
 .wrapper-div-right {
     display: flex;
     flex-direction: column;
-    flex: 20vw;
+    flex: 20%;
     background-color: #ffffff;
     border-left: solid;
     border-color: #5000FA;
+    overflow-y: auto;
 }
 
 .instruction {
@@ -144,6 +156,7 @@
     height: 100%;
     width: 20%;
     padding: 0;
+    overflow-y: auto;
 }
 
 
@@ -225,4 +238,9 @@
     border:solid;
     border-color: #5000FA;
     gap: 1vh;
+    border-radius: 0.5vw;
 }
+
+    .camera.display-none {
+        display: none;
+    }

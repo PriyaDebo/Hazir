@@ -12,8 +12,8 @@ namespace API.Extensions
                 Id = student.Id,
                 Name = student.Name,
                 JoinDate = student.JoinDate,
-                PersistedFaceid = student.PersistedFaceId
             };
+
             return model;
         }
     }

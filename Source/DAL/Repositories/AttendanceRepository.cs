@@ -7,17 +7,15 @@ namespace DAL.Repositories
 {
     public class AttendanceRepository
     {
-        private CosmosClient? client;
-        private Database? database;
-        private Container? container;
-        readonly ConnectDatabase cd;
+        private CosmosClient client;
+        private Database database;
+        private Container container;
 
-        public AttendanceRepository()
+        public AttendanceRepository(CosmosClient client)
         {
-            cd = new ConnectDatabase();
-            client = cd.Client;
-            database = client.GetDatabase("Hazir");
-            container = database.GetContainer("Attendance");
+            this.client = client;
+            this.database = client.GetDatabase("Hazir");
+            this.container = database.GetContainer("Attendance");
         }
 
         public async Task<AttendanceData> CreateAttendanceDataAsync(string date, string classId)
@@ -29,6 +27,7 @@ namespace DAL.Repositories
                 ClassId = classId,
                 PresentStudentIds = new List<string>()
             };
+
             var attendanceItemCreated = await container.CreateItemAsync<AttendanceData>(attendance);
             return attendanceItemCreated.Resource;
         }
@@ -36,7 +35,7 @@ namespace DAL.Repositories
         public async Task<IAttendance> GetAttendanceDataAsync(string id, string classId)
         {
             var partitionKey = new PartitionKey(classId);
-            var response = await container.ReadItemAsync<AttendanceData>(id, partitionKey);
+            var response = await this.container.ReadItemAsync<AttendanceData>(id, partitionKey);
             if (response == null)
             {
                 return null;
@@ -56,8 +55,8 @@ namespace DAL.Repositories
         public async Task<IAttendance> GetAttendanceDataByClassAndDateAsync(string classId, string date)
         {
             var query = $"SELECT * FROM Attendance WHERE Attendance.classId = @classId AND Attendance.date = @date";
-            QueryDefinition queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId).WithParameter("@date", date);
-            var attendanceResponse = container.GetItemQueryIterator<AttendanceData>(queryDefinition);
+            var queryDefinition = new QueryDefinition(query).WithParameter("@classId", classId).WithParameter("@date", date);
+            var attendanceResponse = this.container.GetItemQueryIterator<AttendanceData>(queryDefinition);
             var response = await attendanceResponse.ReadNextAsync();
             if (response.Resource.FirstOrDefault() == null)
             {
@@ -77,16 +76,18 @@ namespace DAL.Repositories
 
         public async Task<bool> MarkAttendanceAsync(string id, string classId, string studentId)
         {
-            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            var attendance = await this.container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
             if (attendance == null)
             {
                 return false;
             }
+
             var newAttendance = new AttendanceData(attendance.Resource);
             if (newAttendance.PresentStudentIds == null)
             {
                 newAttendance.PresentStudentIds = new List<string>();
             }
+
             newAttendance.PresentStudentIds.Add(studentId);
             await container.ReplaceItemAsync<AttendanceData>(newAttendance, id);
             return true;
@@ -94,7 +95,7 @@ namespace DAL.Repositories
 
         public async Task<bool> UnmarkAttendanceAsync(string id, string classId, string studentId)
         {
-            var attendance = await container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
+            var attendance = await this.container.ReadItemAsync<AttendanceData>(id, new PartitionKey(classId));
             if (attendance == null)
             {
                 return false;

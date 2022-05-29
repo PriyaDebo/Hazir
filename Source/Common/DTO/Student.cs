@@ -9,7 +9,5 @@ namespace Common.DTO
         public string Name { get; set; }
 
         public string JoinDate { get; set; }
-
-        public string PersistedFaceId { get; set; }
     }
 }

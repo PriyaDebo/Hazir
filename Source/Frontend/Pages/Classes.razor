@@ -1,6 +1,13 @@
 ﻿@page "/classes"
+
 @using Common.APIModels;
+@using Microsoft.Azure.CognitiveServices.Vision.Face;
+@using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 @using System.Diagnostics;
+@using System.Text.RegularExpressions;
+@using Frontend.Operations;
+
+@inject FaceApiOperations ApiOperations;
 @inject HttpClient Http;
 @inject IJSRuntime JSRuntime;
 
@@ -36,32 +43,53 @@
                                 <span class = "oi oi-pencil" />
                                 @classData?.Name
                             </button>
-                            }
+                        }
                     }
                 }
             </div>
         </div>
 
         <div class = "wrapper-div-middle">
-           @if (selectedClass != null)
-           {
-               <EditForm Model = "@Date" OnValidSubmit = "@HandleValidSubmit">
-                   <div  class = "form">
+
+            @if (true)
+            {
+                string formCss = "form display-none";
+                string cameraCss = "camera display-none";
+                string captureCss = "take-attendance display-none";
+                if (selectedClass != null)
+                {
+                    formCss = "form";
+                }
+
+                if (attendanceStarted)
+                {
+                    cameraCss = "camera";
+                }
+
+                <EditForm Model = "@Date" OnValidSubmit = "@HandleValidSubmit">
+                   <div  class = "@formCss">
                        <div class = "fill-date">
                            <label for="Date">Attendance Date</label>
                            <InputDate id = "attendance-date" class = "fill-date select-date" @bind-Value = "Date"/>
                        </div>
-                       <button type = "submit" class = "take-attendance" >Take Attendance</button>
+                       <button type = "submit" class = "take-attendance"> Take Attendance</button>
                    </div>
-               </EditForm>
-           }
+                </EditForm>
 
-            @if (true)
-            {
-                <div class = "camera">
-                         <div id="camera"></div>
-                 <button class = "take-attendance" @onclick="Capture">Capture</button>
-                 </div>
+                if (canCapture)
+                {
+                    captureCss = "take-attendance";
+                }
+
+
+
+                <div class = "@cameraCss">
+                    <div id="camera"></div>
+                    @if (canCapture)
+                    {
+                        <button class = "take-attendance" @onclick="Capture">Capture</button>
+                    }
+                </div>
             }
         </div>
 
@@ -135,12 +163,31 @@
 
 @code{
 
+    private List<ClassResponseModel> classes;
+    private AttendanceResponseModel attendance;
+    private ClassResponseModel selectedClass;
+    private int studentCount = 0;
+    private bool attendanceStarted = false;
+    public bool canCapture = false;
+
+    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
+    private bool expandSubNav;
 
     List<string> stringList = new List<string>();
     string aa = "";
+
     public async void Capture()
     {
-        stringList.Add(await JSRuntime.InvokeAsync<string>("take_snapshot"));
+        var imageUrl = await JSRuntime.InvokeAsync<string>("take_snapshot");
+        var base64Data = Regex.Match(imageUrl, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+        var binData = Convert.FromBase64String(base64Data);
+        var stream = new MemoryStream(binData);
+
+        canCapture = false;
+        StateHasChanged();
+        //await Task.Delay(2000);
+        await DetectAndRecognize(stream);
+        canCapture = true;
         StateHasChanged();
     }
 
@@ -152,25 +199,19 @@
         }
     }
 
-
-    private List<ClassResponseModel> classes;
-    private AttendanceResponseModel attendance;
-    private ClassResponseModel selectedClass;
-    private int studentCount = 0;
-    private bool attendanceStarted = false;
-
-    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
-    private bool expandSubNav;
-
     private bool isPresent(string studentId)
     {
-        foreach (var student in attendance.PrsesentStudents)
+        if (attendance.PrsesentStudents != null)
         {
-            if (student.Id == studentId)
+            foreach (var student in attendance.PrsesentStudents)
             {
-                return true;
+                if (student.Id == studentId)
+                {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -181,9 +222,10 @@
         studentCount = 0;
     }
 
-    private void selectClass(ClassResponseModel classData)
+    private async void selectClass(ClassResponseModel classData)
     {
         this.selectedClass = classData;
+        await this.GetAttendanceAsync();
         studentCount = 0;
     }
 
@@ -191,7 +233,7 @@
     {
         var uriFormat = @"https://localhost:7204/Hazir/CreateAttendanceItem/classes/{0}/date/{1}";
         var uri = string.Format(uriFormat, Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(Date.ToString()));
-        var response = await Http.PutAsJsonAsync<AttendanceResponseModel>(uri, null);
+        var response = await Http.PutAsJsonAsync<AttendanceResponseModel> (uri, null);
 
         var attendance = await response.Content.ReadFromJsonAsync<AttendanceResponseModel>();
         if (attendance != null)
@@ -199,10 +241,66 @@
             attendanceStarted = true;
             this.attendance = attendance;
         }
+        canCapture = true;
+        StateHasChanged();
+    }
+
+    public async Task GetAttendanceAsync()
+    {
+        var uriFormat = @"https://localhost:7204/Hazir/GetAttendanceByClassAndDate/classes/{0}/date/{1}";
+        var uri = string.Format(uriFormat, Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(Date.ToString()));
+        var response = await Http.GetFromJsonAsync<AttendanceResponseModel>(uri);
+        if (response != null)
+        {
+            this.attendance = response;
+            attendanceStarted = true;
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task DetectAndRecognize(Stream image)
+    {
+        var faceIds = await ApiOperations.DetectFaceAsync(image);
+        if (faceIds.Count > 0)
+        {
+            var studentId = await ApiOperations.RecognizeFaceAsync(faceIds);
+            if (studentId != null)
+            {
+                await MarkAttendanceAsync(studentId);
+            }
+        }
+    }
+
+    public async Task MarkAttendanceAsync(string studentId)
+    {
+        var uriFormat = @"https://localhost:7204/Hazir/MarkAttendance/attendance/{0}/classes/{1}/students/{2}";
+        var uri = string.Format(uriFormat, Uri.EscapeDataString(attendance.Id), Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(studentId));
+        var response = await Http.PostAsync(uri, null);
+        await this.GetAttendanceAsync();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
+        //await faceAPIOperations.DeleteAllFacesAsync();
+        //await faceAPIOperations.CreatePersonGroupAsync();
+
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://cdn.britannica.com/41/218341-050-51D8903F/American-actor-John-Krasinski-2020.jpg", "John", "2287612e-b58d-46ad-b606-9c929506cff4");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://stylesatlife.com/wp-content/uploads/2021/11/Deepika-Padukone-Face-Shape.jpg","Deepika","44ecbe6c-65c0-43c6-ac43-80ab32276d3a");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Liam_Hemsworth_June_2016.jpg/800px-Liam_Hemsworth_June_2016.jpg","Liam", "da23c451-27b6-4ecb-9775-8278d8e11b15");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://filmfare.wwmindia.com/content/2018/mar/thu_1520432436.jpg","Madhuri","5c967e59-8204-448a-9df0-907f30ffda4a");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://assets.teenvogue.com/photos/57b21ac3f905d69b69712825/16:9/w_2560%2Cc_limit/GettyImages-513006150.jpg","Sophie", "c3e9a82f-b87c-4530-bffd-2d09a1eef4ce");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://www.dailypioneer.com/uploads/2020/story/images/big/kanan-gill-gets-first-netflix-original-comedy-special-2020-04-04.jpg","Kanan", "69906e17-a5d7-46d4-b37c-647d6b6f8eb6");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://i2.cinestaan.com/image-bank/1500-1500/132001-133000/132977.jpg","Shaan", "bca4333e-d443-4103-a0f7-9af250830925");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://scontent.fccu19-1.fna.fbcdn.net/v/t39.30808-6/241132299_256239166502984_6348775860402915062_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=scRcRjxRNt8AX_eGzBt&_nc_ht=scontent.fccu19-1.fna&oh=00_AT944wbQK1Jfs6YtTcdlTWFQX5y4nAd8Puq3PWTTRHJ-zw&oe=62972F81","Debopriya","207312f9-9ccc-4915-8c05-0d67aa3f3492");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://pbs.twimg.com/profile_images/1249391923594436608/tZZjwavR_400x400.jpg","Gautam","091f9fe4-ef5b-4e58-b74f-196cc07d491c");
+        //await faceAPIOperations.CreatePersonGroupPersonAsync ("https://scontent.fccu19-1.fna.fbcdn.net/v/t1.6435-9/41951358_1330759950389187_4905570216513110016_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=e3f864&_nc_ohc=xEddw_NOTxcAX9UV09d&_nc_ht=scontent.fccu19-1.fna&oh=00_AT_EZtulVrUxJFVYDGfMo2voHc2Uh-N1B3MncO3k_LXmNg&oe=62B7DF02","Nanda","cbdcdb32-1dd3-4d2b-9924-807e9dcf0195");
+
+
+        //await faceAPIOperations.TrainPersonGroupAsync();
+        //await faceAPIOperations.GetPersonGroupAsync();
+
         var response = await Http.GetFromJsonAsync<List<ClassResponseModel>>("https://localhost:7204/Hazir/GetClassesByTeacher/teachers/79f4b45a-5043-4132-a168-07e21310062b");
         if (response != null)
         {

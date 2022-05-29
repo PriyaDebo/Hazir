@@ -7,7 +7,5 @@
         string Name { get; }
 
         string JoinDate { get; }
-
-        string PersistedFaceId { get; }
     }
 }

@@ -16,10 +16,10 @@
 
 function take_snapshot() {
 	// take snapshot and get image data
-	var data = null;
+	var dataURI = null;
 	Webcam.snap(function (data_uri) {
 
-		data = data_uri;
+		dataURI = data_uri;
 	});
-	return data;
+	return dataURI;
 }
