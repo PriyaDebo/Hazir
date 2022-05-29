@@ -9,10 +9,10 @@ namespace BL.Operations
         ClassRepository classRepository;
         StudentOperations studentOperations;
 
-        public ClassOperations()
+        public ClassOperations(ClassRepository classRepository, StudentOperations studentOperations)
         {
-            classRepository = new ClassRepository();
-            studentOperations = new StudentOperations();
+            this.classRepository = classRepository;
+            this.studentOperations = studentOperations;
         }
 
         public async Task<IEnumerable<IClass>> GetAsync()

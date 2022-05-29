@@ -9,10 +9,10 @@ namespace BL.Operations
         AttendanceRepository attendanceRepository;
         StudentRepository studentRepository;
 
-        public AttendanceOperations()
+        public AttendanceOperations(AttendanceRepository attendanceRepository, StudentRepository studentRepository)
         {
-            attendanceRepository = new AttendanceRepository();
-            studentRepository = new StudentRepository();
+            this.attendanceRepository = attendanceRepository;
+            this.studentRepository = studentRepository;
         }
 
         public async Task<IAttendance> AddStudentDataAsync(IAttendance attendanceResponse)
@@ -25,28 +25,40 @@ namespace BL.Operations
                 PresentStudentIds = attendanceResponse.PresentStudentIds,
             };
 
-            if (attendance.PresentStudents == null)
+            if (attendance.PresentStudentIds != null)
             {
-                attendance.PresentStudents = new List<IStudent>();
-            }
+                if (attendance.PresentStudents == null)
+                {
+                    attendance.PresentStudents = new List<IStudent>();
+                }
 
-            foreach (var studentId in attendanceResponse.PresentStudentIds)
-            {
-                attendance.PresentStudents.Add(await studentRepository.GetStudentByIdAsync(studentId));
-            }
 
+                foreach (var studentId in attendanceResponse.PresentStudentIds)
+                {
+                    var student = await studentRepository.GetStudentByIdAsync(studentId);
+                    if (student != null)
+                    {
+                        attendance.PresentStudents.Add(await studentRepository.GetStudentByIdAsync(studentId));
+                    }
+                }
+            }
             return attendance;
         }
 
         public async Task<IAttendance> CreateAttendanceItem(string date, string classId)
         {
+            var alreadyExists = await attendanceRepository.GetAttendanceDataByClassAndDateAsync(classId, date);
+            if (alreadyExists != null)
+            {
+                return await GetAttendanceByClassAndDateAsync(classId, date);
+            }
+
             var response = await attendanceRepository.CreateAttendanceDataAsync(date, classId);
             var attendance = new Attendance()
             {
                 ClassId = response.ClassId,
                 Date = response.Date,
                 Id = response.Id,
-                PresentStudentIds = response.PresentStudentIds,
             };
 
             return attendance;
@@ -58,22 +70,25 @@ namespace BL.Operations
             return await AddStudentDataAsync(attendanceResponse);
         }
 
-        public async Task<IAttendance> GetAttendanceByClassAndDateAsync(string classId, string date)
+        public async Task<IAttendance?> GetAttendanceByClassAndDateAsync(string classId, string date)
         {
             var attendanceResponse = await attendanceRepository.GetAttendanceDataByClassAndDateAsync(classId, date);
-            return await AddStudentDataAsync(attendanceResponse);
+            if (attendanceResponse != null)
+            {
+                return await AddStudentDataAsync(attendanceResponse);
+            }
+
+            return null;
         }
 
         public async Task<bool> MarkAttendanceAsync(string id, string classId, string studentId)
         {
             return await attendanceRepository.MarkAttendanceAsync(id, classId, studentId);
-
         }
 
         public async Task<bool> UnmarkAttendanceAsync(string id, string classId, string studentId)
         {
             return await attendanceRepository.UnmarkAttendanceAsync(id, classId, studentId);
         }
-
     }
 }

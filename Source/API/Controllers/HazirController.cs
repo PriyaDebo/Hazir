@@ -10,30 +10,31 @@ namespace API.Controllers
     public class HazirController : ControllerBase
     {
 
-        private readonly ILogger<HazirController> logger;
         StudentOperations studentOperations;
         ClassOperations classOperations;
         AttendanceOperations attendanceOperations;
+        private readonly IConfiguration configuration;
 
-        public HazirController(ILogger<HazirController> logger)
+        public HazirController(IConfiguration configuration, StudentOperations studentOperations, ClassOperations classOperations, AttendanceOperations attendanceOperations)
         {
-            this.logger = logger;
-            studentOperations = new StudentOperations();
-            classOperations = new ClassOperations();
-            attendanceOperations = new AttendanceOperations();
+            this.studentOperations = studentOperations;
+            this.classOperations = classOperations;
+            this.attendanceOperations = attendanceOperations;
+            this.configuration = configuration;
         }
 
         [HttpGet]
         [Route("GetAllStudents")]
-        public async Task<IEnumerable<StudentResponseModel>> GetAllStudentsAsync()
+        public async Task<ActionResult<IEnumerable<StudentResponseModel>>> GetAllStudentsAsync()
         {
-            var students = await studentOperations.GetAsync();
+            var students = await this.studentOperations.GetAsync();
             var studentAPI = new List<StudentResponseModel>();
             foreach (var student in students)
             {
                 studentAPI.Add(student.ToAPIModel());
             }
-            return studentAPI;
+
+            return Ok(studentAPI);
         }
 
         [HttpGet]
@@ -46,6 +47,7 @@ namespace API.Controllers
             {
                 classAPI.Add(singleClass.ToAPIModel());
             }
+
             return Ok(classAPI);
         }
 
@@ -65,6 +67,7 @@ namespace API.Controllers
             {
                 classAPI.Add(singleClass.ToAPIModel());
             }
+
             return Ok(classAPI);
         }
 
@@ -93,7 +96,7 @@ namespace API.Controllers
             }
 
             var student = await studentOperations.GetByIdAsync(parsedStudentId.ToString());
-            return student.ToAPIModel();
+            return Ok(student.ToAPIModel());
         }
 
         [HttpPut]
@@ -106,12 +109,18 @@ namespace API.Controllers
                 return BadRequest("Invalid Class Id");
             }
 
-            var isDate = DateOnly.TryParse(date, out var parsedDate);
-            if (!isDate)
-            {
-                return BadRequest("Invalid Date");
-            }
-            var attendance = await attendanceOperations.CreateAttendanceItem(parsedDate.ToString(), parsedClassId.ToString());
+            date = Uri.UnescapeDataString(date);
+
+            //string format = "dd/MM/yyyy";
+
+            //var isDate = DateTime.TryParseExact(date, "M-d-yyyy h:mm tt zzz", CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
+            //if (!isDate)
+            //{
+            //    return BadRequest("Invalid Date");
+            //}
+
+
+            var attendance = await attendanceOperations.CreateAttendanceItem(date, parsedClassId.ToString());
             return Ok(attendance.ToAPIModel());
         }
 
@@ -145,14 +154,21 @@ namespace API.Controllers
                 return BadRequest("Invalid Class Id");
             }
 
-            var isDate = DateOnly.TryParse(date, out var parsedDate);
-            if (!isDate)
+            date = Uri.UnescapeDataString(date);
+
+            //var isDate = DateOnly.TryParse(date, out var parsedDate);
+            //if (!isDate)
+            //{
+            //    return BadRequest("Invalid Date");
+            //}
+
+            var responseAttendance = await attendanceOperations.GetAttendanceByClassAndDateAsync(parsedClassId.ToString(), date);
+            if (responseAttendance != null)
             {
-                return BadRequest("Invalid Date");
+                return Ok(responseAttendance.ToAPIModel());
             }
 
-            var responseAttendance = await attendanceOperations.GetAttendanceByClassAndDateAsync(parsedClassId.ToString(), parsedDate.ToString());
-            return Ok(responseAttendance.ToAPIModel());
+            return Ok(new AttendanceResponseModel());
         }
 
         [HttpPost]
@@ -182,6 +198,7 @@ namespace API.Controllers
             {
                 return Ok(response);
             }
+
             return NotFound("Invalid Id");
         }
 
@@ -212,6 +229,7 @@ namespace API.Controllers
             {
                 return Ok(response);
             }
+
             return NotFound("Invalid Id");
         }
     }

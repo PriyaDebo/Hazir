@@ -7,24 +7,22 @@ namespace DAL.Repositories
 {
     public class StudentRepository
     {
-        private CosmosClient? client;
-        private Database? database;
-        private Container? container;
-        readonly ConnectDatabase cd;
+        private CosmosClient client;
+        private Database database;
+        private Container container;
 
-        public StudentRepository()
+        public StudentRepository(CosmosClient client)
         {
-            cd = new ConnectDatabase();
-            client = cd.Client;
-            database = client.GetDatabase("Hazir");
-            container = database.GetContainer("Students");
+            this.client = client;
+            this.database = client.GetDatabase("Hazir");
+            this.container = database.GetContainer("Students");
         }
 
         public async Task<IEnumerable<IStudent>> GetAllStudentsAsync()
         {
             var students = new List<IStudent>();
             var query = "SELECT * FROM c";
-            QueryDefinition definition = new QueryDefinition(query);
+            var definition = new QueryDefinition(query);
             var Iterator = container.GetItemQueryIterator<StudentData>(definition);
             while (Iterator.HasMoreResults)
             {
@@ -38,32 +36,38 @@ namespace DAL.Repositories
                             Id = studentData.Id,
                             Name = studentData.Name,
                             JoinDate = studentData.JoinDate,
-                            PersistedFaceId = studentData.PersistedFaceId,
                         });
                     }
                 }
             }
+
             return students;
         }
 
         public async Task<IStudent> GetStudentByIdAsync(string id)
         {
-            PartitionKey partitionKey = new PartitionKey(id);
-            var response = await container.ReadItemAsync<StudentData>(id, partitionKey);
-            if (response == null)
+            var partitionKey = new PartitionKey(id);
+            try
+            {
+                var response = await container.ReadItemAsync<StudentData>(id, partitionKey);
+                if (response == null)
+                {
+                    return null;
+                }
+
+                var studentResponse = new Student()
+                {
+                    Id = response.Resource.Id,
+                    Name = response.Resource.Name,
+                    JoinDate = response.Resource.JoinDate,
+                };
+
+                return studentResponse;
+            }
+            catch(Exception)
             {
                 return null;
             }
-
-            var studentResponse = new Student()
-            {
-                Id = response.Resource.Id,
-                Name = response.Resource.Name,
-                JoinDate = response.Resource.JoinDate,
-                PersistedFaceId = response.Resource.PersistedFaceId
-            };
-
-            return studentResponse;
         }
     }
 }

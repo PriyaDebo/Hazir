@@ -7,9 +7,9 @@ namespace BL.Operations
     {
         StudentRepository students;
 
-        public StudentOperations()
+        public StudentOperations(StudentRepository studentRepository)
         {
-            students = new StudentRepository();
+            this.students = studentRepository;
         }
 
         public async Task<IEnumerable<IStudent>> GetAsync()

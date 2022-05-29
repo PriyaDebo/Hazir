@@ -16,7 +16,6 @@ namespace DAL.Models
             Id = student.Id;
             Name = student.Name;
             JoinDate = student.JoinDate;
-            PersistedFaceId = student.PersistedFaceId;
         }
 
         [JsonProperty(PropertyName = "id")]
@@ -27,8 +26,5 @@ namespace DAL.Models
 
         [JsonProperty(PropertyName = "joinDate")]
         public string JoinDate { get; set; }
-
-        [JsonProperty(PropertyName = "persistedFaceId")]
-        public string PersistedFaceId { get; set; }
     }
 }
