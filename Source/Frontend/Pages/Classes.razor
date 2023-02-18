@@ -6,7 +6,9 @@
 @using System.Diagnostics;
 @using System.Text.RegularExpressions;
 @using Frontend.Operations;
+@using Microsoft.Extensions.Configuration;
 
+@inject IConfiguration Configuration;
 @inject FaceApiOperations ApiOperations;
 @inject HttpClient Http;
 @inject IJSRuntime JSRuntime;
@@ -169,6 +171,7 @@
     private int studentCount = 0;
     private bool attendanceStarted = false;
     public bool canCapture = false;
+    private string baseUri;
 
     private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
     private bool expandSubNav;
@@ -231,7 +234,7 @@
 
     private async void HandleValidSubmit()
     {
-        var uriFormat = @"https://localhost:7204/Hazir/CreateAttendanceItem/classes/{0}/date/{1}";
+        var uriFormat = this.baseUri + @"/Hazir/CreateAttendanceItem/classes/{0}/date/{1}";
         var uri = string.Format(uriFormat, Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(Date.ToString()));
         var response = await Http.PutAsJsonAsync<AttendanceResponseModel> (uri, null);
 
@@ -247,7 +250,7 @@
 
     public async Task GetAttendanceAsync()
     {
-        var uriFormat = @"https://localhost:7204/Hazir/GetAttendanceByClassAndDate/classes/{0}/date/{1}";
+        var uriFormat = this.baseUri + @"/Hazir/GetAttendanceByClassAndDate/classes/{0}/date/{1}";
         var uri = string.Format(uriFormat, Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(Date.ToString()));
         var response = await Http.GetFromJsonAsync<AttendanceResponseModel>(uri);
         if (response != null)
@@ -274,7 +277,7 @@
 
     public async Task MarkAttendanceAsync(string studentId)
     {
-        var uriFormat = @"https://localhost:7204/Hazir/MarkAttendance/attendance/{0}/classes/{1}/students/{2}";
+        var uriFormat = this.baseUri + @"/Hazir/MarkAttendance/attendance/{0}/classes/{1}/students/{2}";
         var uri = string.Format(uriFormat, Uri.EscapeDataString(attendance.Id), Uri.EscapeDataString(selectedClass.Id), Uri.EscapeDataString(studentId));
         var response = await Http.PostAsync(uri, null);
         await this.GetAttendanceAsync();
@@ -301,7 +304,9 @@
         //await faceAPIOperations.TrainPersonGroupAsync();
         //await faceAPIOperations.GetPersonGroupAsync();
 
-        var response = await Http.GetFromJsonAsync<List<ClassResponseModel>>("https://localhost:7204/Hazir/GetClassesByTeacher/teachers/79f4b45a-5043-4132-a168-07e21310062b");
+        this.baseUri = Configuration["BackendUri"];
+
+        var response = await Http.GetFromJsonAsync<List<ClassResponseModel>>($"{this.baseUri}/Hazir/GetClassesByTeacher/teachers/79f4b45a-5043-4132-a168-07e21310062b");
         if (response != null)
         {
             this.classes = response;
